@@ -30,3 +30,9 @@
 *.exe
 *.out
 *.app
+
+# herby cache and trash
+.vs
+obj
+bin
+
