@@ -10,7 +10,6 @@ namespace shared::option
 
 	std::string m_directory = { };
 	std::string m_directory_current = { };
-	std::string m_directory_new = { };
 
 	bool Create()
 	{
@@ -98,7 +97,10 @@ namespace shared::option
 	void set_color(const std::string& app_name, const std::string& key_name, ImColor value)
 	{
 		char key_data[128] = { };
-		sprintf_s(key_data, "%f", value);
+		sprintf_s(key_data, "%f", value.Value.x);
+		sprintf_s(key_data, "%f", value.Value.y);
+		sprintf_s(key_data, "%f", value.Value.z);
+		sprintf_s(key_data, "%f", value.Value.w);
 
 		WritePrivateProfileStringA(app_name.c_str(), key_name.c_str(), key_data, m_directory.c_str());
 	}

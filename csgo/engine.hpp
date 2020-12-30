@@ -29,11 +29,13 @@ extern IGameUI* m_game_ui;
 extern IGameMovement* m_game_movement;
 extern IInputSystem* m_input_system;
 extern ILocalize* m_localize;
+extern IPhysicsSurfaceProps* m_physics_surface_props;
 
 extern CGlobalVarsBase* m_globals;
 extern IClientMode* m_client_mode;
 extern IWeaponSystem* m_weapon_system;
 extern C_GlowObjectManager* m_glow_object;
+extern IMemAlloc* m_mem_alloc;
 
 extern IDirect3DDevice9* m_direct_device;
 

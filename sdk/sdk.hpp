@@ -845,6 +845,8 @@ enum CommandButtons
 //
 bool WorldToScreen( const Vector& world, ImVec2& screen );
 bool SmokeTraceLine(Vector start, Vector end);
+void RandomSeed(unsigned int seed);
+float RandomFloat(float min, float max);
 
 //
 // typedefs
@@ -970,6 +972,7 @@ class IWeaponSystem;
 class IGameUI;
 class IInputSystem;
 class ILocalize;
+class IPhysicsSurfaceProps;
 
 struct player_info_t
 {
@@ -1168,6 +1171,64 @@ struct Ray_t
 		m_Start = start.ToVector4() + m_StartOffset;
 		m_StartOffset *= -1.f;
 	}
+};
+
+struct surfacephysicsparams_t
+{
+	float    friction;
+	float    elasticity;
+	float    density;
+	float    thickness;
+	float    dampening;
+};
+
+struct surfaceaudioparams_t
+{
+	float    reflectivity;             // like elasticity, but how much sound should be reflected by this surface
+	float    hardnessFactor;           // like elasticity, but only affects impact sound choices
+	float    roughnessFactor;          // like friction, but only affects scrape sound choices   
+	float    roughThreshold;           // surface roughness > this causes "rough" scrapes, < this causes "smooth" scrapes
+	float    hardThreshold;            // surface hardness > this causes "hard" impacts, < this causes "soft" impacts
+	float    hardVelocityThreshold;    // collision velocity > this causes "hard" impacts, < this causes "soft" impacts   
+	float    highPitchOcclusion;       //a value betweeen 0 and 100 where 0 is not occluded at all and 100 is silent (except for any additional reflected sound)
+	float    midPitchOcclusion;
+	float    lowPitchOcclusion;
+};
+
+struct surfacesoundnames_t
+{
+	unsigned short    walkStepLeft;
+	unsigned short    walkStepRight;
+	unsigned short	  runStepLeft;
+	unsigned short	  runStepRight;
+	unsigned short    impactSoft;
+	unsigned short    impactHard;
+	unsigned short    scrapeSmooth;
+	unsigned short    scrapeRough;
+	unsigned short    bulletImpact;
+	unsigned short    rolling;
+	unsigned short    breakSound;
+	unsigned short    strainSound;
+};
+
+struct surfacegameprops_t
+{
+public:
+	float max_speed_factor = 0.f;
+	float jump_factor = 0.f;
+	float penetration_modifier = 0.f;
+	float damage_modifier = 0.f;
+	unsigned short material = 0u;
+	unsigned char climbable = 0u;
+	PAD(0x04);
+};
+
+struct surfacedata_t
+{
+	surfacephysicsparams_t	physics;
+	surfaceaudioparams_t	audio;
+	surfacesoundnames_t		sounds;
+	surfacegameprops_t		game;
 };
 
 class InterfaceReg
@@ -1742,6 +1803,14 @@ public:
 	VFUNC(ConVar*, FindVar, 14, (const char* var_name), (this, var_name))
 };
 
+class IMemAlloc
+{
+public:
+	VFUNC(void*, Alloc, 1, (int nSize), (this, nSize))
+	VFUNC(void*, Realloc, 3, (void* pMem, int nSize), (this, pMem, nSize))
+	VFUNC(void*, Free, 5, (void* pMem), (this, pMem))
+};
+
 class IMaterialSystem
 {
 public:
@@ -1788,6 +1857,38 @@ class IGameEventManager
 public:
 	VFUNC(bool, AddListener, 3, (IGameEventListener2* listener, const char* name, bool bServerSide), (this, listener, name, bServerSide))
 	VFUNC(int, RemoveListener, 5, (IGameEventListener2* listener), (this, listener))
+	VFUNC(bool, FireEventClientSide, 9, (IGameEvent* events), (this, events))
+};
+
+class SpoofedConVar
+{
+public:
+	SpoofedConVar() = default;
+	SpoofedConVar(const char* var_name);
+	SpoofedConVar(ConVar * cvar);
+
+	~SpoofedConVar();
+
+	bool IsSpoofed();
+	void Spoof();
+
+	void SetFlags(int flags);
+	int GetFlags();
+
+	void SetBool(bool value);
+	void SetInt(int value);
+	void SetFloat(float value);
+private:
+	ConVar* m_cvar_restore = nullptr;
+	ConVar* m_cvar_replace = nullptr;
+
+	char m_restore_name[128] = { };
+	float m_restore_value = 0.f;
+
+	char m_replace_name[128] = { };
+	float m_replace_value = 0.f;
+
+	int m_restore_flags = 0;
 };
 
 class KeyValues
@@ -1882,4 +1983,11 @@ public:
 	int size = 0;
 	GlowObjectDefinition_t* m_Unknown = nullptr;
 	int	currentObjects = 0;
+};
+
+
+class IPhysicsSurfaceProps
+{
+public:
+	VFUNC(surfacedata_t*, GetSurfaceData, 5, (int dataIndex), (this, dataIndex))
 };

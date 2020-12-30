@@ -78,6 +78,7 @@
     <ClInclude Include="shared\imgui\imconfig.hpp" />
     <ClInclude Include="csgo\feature\esp.hpp" />
     <ClInclude Include="shared\core\data.hpp" />
+    <ClInclude Include="shared\hash\xorstr.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="sdk\object\player.hpp" />

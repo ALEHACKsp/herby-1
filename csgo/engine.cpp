@@ -21,11 +21,14 @@ IGameUI* m_game_ui = nullptr;
 IGameMovement* m_game_movement = nullptr;
 IInputSystem* m_input_system = nullptr;
 ILocalize* m_localize = nullptr;
+IPhysicsSurfaceProps* m_physics_surface_props = nullptr;
+
 
 CGlobalVarsBase* m_globals = nullptr;
 IClientMode* m_client_mode = nullptr;
 IWeaponSystem* m_weapon_system = nullptr;
 C_GlowObjectManager* m_glow_object = nullptr;
+IMemAlloc* m_mem_alloc = nullptr;
 
 IDirect3DDevice9* m_direct_device = nullptr;
 
@@ -53,6 +56,7 @@ bool Create()
 	engine::Factory factory_vstdlib("vstdlib.dll");
 	engine::Factory factory_input("inputsystem.dll");
 	engine::Factory factory_localize("localize.dll");
+	engine::Factory factory_vphysics("vphysics.dll");
 
 	if (!input.Create())
 	{
@@ -63,6 +67,12 @@ bool Create()
 	if (!system.Create())
 	{
 		d_print("system.Create()");
+		return false;
+	}
+
+	if (!option::Create())
+	{
+		d_print("option::Create()");
 		return false;
 	}
 
@@ -141,6 +151,11 @@ bool Create()
 	if (!m_localize)
 		return false;
 
+	m_physics_surface_props = factory_vphysics.Get< IPhysicsSurfaceProps* >("VPhysicsSurfaceProps");
+
+	if (!m_physics_surface_props)
+		return false;
+
 	m_globals = **reinterpret_cast<CGlobalVarsBase***>(m_base_client->ToArray(11) + 10);
 
 	if( !m_globals )
@@ -159,6 +174,11 @@ bool Create()
 	m_glow_object = memory::scan< C_GlowObjectManager* >("client.dll", "0F 11 05 ? ? ? ? 83 C8 01", 3u);
 
 	if (!m_glow_object)
+		return false;
+
+	m_mem_alloc = *reinterpret_cast<IMemAlloc**>(GetProcAddress(GetModuleHandleA("tier0.dll"), "g_pMemAlloc"));
+
+	if (!m_mem_alloc)
 		return false;
 
 	m_direct_device = memory::scan< IDirect3DDevice9* >("shaderapidx9.dll", "A1 ? ? ? ? 50 8B 08 FF 51 0C", 1u);
@@ -213,6 +233,7 @@ void Destroy()
 	
 	input.Destroy();
 	system.Destroy();
+	option::Destroy();
 	
 	gui.Destroy();
 

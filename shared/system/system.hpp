@@ -43,7 +43,7 @@ private:
 	bool m_quit = false;
 	bool m_gui = false;
 
-	std::string m_execute_directory = { "auto" };
+	std::string m_execute_directory = { "configs" };
 	ExecuteState m_execute_state;
 };
 
