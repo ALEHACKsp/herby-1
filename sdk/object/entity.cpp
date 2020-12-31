@@ -15,6 +15,16 @@ C_BaseEntity* C_BaseEntity::GetBaseEntityFromHandle( const CBaseHandle base_hand
 	return (client_entity ? client_entity->GetBaseEntity() : nullptr);
 }
 
+void C_BaseEntity::SetPredictionSeed(CUserCmd* cmd)
+{
+	static auto m_pPredictionRandomSeed = memory::scan< int* >("client.dll", "8B 0D ? ? ? ? BA ? ? ? ? E8 ? ? ? ? 83 C4 04", 2, 1u);
+
+	if (cmd)
+		*m_pPredictionRandomSeed = cmd->random_seed;
+	else
+		*m_pPredictionRandomSeed = -1;
+}
+
 bool C_BaseAnimating::GetBoneTransform(matrix3x4_t* output, float time /*= 0.f*/)
 {
 	return SetupBones(output, 128, 256, time);

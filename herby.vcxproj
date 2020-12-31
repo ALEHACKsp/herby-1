@@ -143,9 +143,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="csgo\engine\prediction.cpp" />
     <ClCompile Include="csgo\feature\esp.cpp" />
     <ClCompile Include="csgo\hook\create_move.cpp" />
     <ClCompile Include="csgo\hook\lock_cursor.cpp" />
+    <ClCompile Include="csgo\hook\run_command.cpp" />
     <ClCompile Include="shared\core\data.cpp" />
     <ClCompile Include="shared\imgui\imgui.cpp" />
     <ClCompile Include="shared\imgui\imgui_demo.cpp" />
@@ -181,6 +183,7 @@
     <ClCompile Include="csgo\hook\reset.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="csgo\engine\prediction.hpp" />
     <ClInclude Include="csgo\feature\esp.hpp" />
     <ClInclude Include="shared\auto.hpp" />
     <ClInclude Include="shared\core\data.hpp" />

@@ -7,6 +7,8 @@ class C_BaseEntity : public IClientEntity
 public:
 	static C_BaseEntity* GetBaseEntity( const int index );
 	static C_BaseEntity* GetBaseEntityFromHandle( const CBaseHandle base_handle );
+	
+	static void SetPredictionSeed(CUserCmd* cmd);
 public:
 	VFUNC(bool, IsPlayer, 157, (), (this))
 	VFUNC(bool, IsWeapon, 165, (), (this))

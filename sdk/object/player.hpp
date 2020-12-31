@@ -13,7 +13,6 @@ public:
 	void SetAbsOrigin(const Vector& origin);
 	void SetAbsAngles(const QAngle& angles);
 public:
-public:
 	NET_PROP( char, m_lifeState, "DT_BasePlayer", "m_lifeState" );
 
 	NET_PROP( bool, m_bDucked, "DT_BasePlayer", "m_bDucked" );
@@ -44,13 +43,15 @@ public:
 	NET_PROP( QAngle, m_aimPunchAngle, "DT_BasePlayer", "m_aimPunchAngle" );
 	NET_PROP( QAngle, m_vecPunchAngle, "DT_BasePlayer", "m_vecPunchAngle" );
 	NET_PROP( QAngle, m_vecPunchAngleVel, "DT_BasePlayer", "m_vecPunchAngleVel" );
+	NET_PROP( QAngle, m_viewPunchAngle, "DT_BasePlayer", "m_viewPunchAngle" );
 
 	NET_PROP( CBaseHandle, m_hLastWeapon, "DT_BasePlayer", "m_hLastWeapon" );
 	NET_PROP( CBaseHandle, m_hGroundEntity, "DT_BasePlayer", "m_hGroundEntity" );
 	NET_PROP( CBaseHandle, m_hObserverTarget, "DT_BasePlayer", "m_hObserverTarget" );
 	NET_PROP( CBaseHandle, m_hMyWearables, "DT_BasePlayer", "m_hMyWearables");
 	NET_PROP( CBaseHandle, m_hViewModel, "DT_BasePlayer", "m_hViewModel");
-
+public:
+	NET_PROP_EX(CUserCmd*, m_pCurrentCommand, "DT_BasePlayer", "m_hConstraintEntity", -0xC);
 };
 
 class C_CSPlayer : public C_BasePlayer
@@ -71,42 +72,13 @@ public:
 
 API_INLINE C_BasePlayer* ToBasePlayer( C_BaseEntity* base_entity )
 {
-	if( !base_entity )
+	if (!base_entity || !base_entity->IsPlayer())
 		return nullptr;
 
-	const auto player = ( C_BasePlayer* )( base_entity );
-
-	if( player->m_iHealth() <= 0 )
-		return nullptr;
-
-	const auto client_networkable = player->GetClientNetworkable();
-
-	if( !client_networkable )
-		return nullptr;
-
-	if( client_networkable->IsDormant() )
-		return nullptr;
-
-	return player;
+	return reinterpret_cast<C_BasePlayer*>(base_entity);
 }
 
 API_INLINE C_CSPlayer* ToCSPlayer( C_BaseEntity* base_entity )
 {
-	if( !base_entity )
-		return nullptr;
-
-	const auto player = ( C_CSPlayer* )( base_entity );
-	
-	if( player->m_iHealth() <= 0 )
-		return nullptr;
-
-	const auto client_networkable = player->GetClientNetworkable();
-
-	if( !client_networkable )
-		return nullptr;
-
-	if( client_networkable->IsDormant() )
-		return nullptr;
-
-	return player;
+	return reinterpret_cast<C_CSPlayer*>(ToBasePlayer(base_entity));
 }

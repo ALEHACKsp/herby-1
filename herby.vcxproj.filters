@@ -37,6 +37,8 @@
     <ClCompile Include="csgo\feature\esp.cpp" />
     <ClCompile Include="shared\memory\procedure.cpp" />
     <ClCompile Include="shared\core\data.cpp" />
+    <ClCompile Include="csgo\engine\prediction.cpp" />
+    <ClCompile Include="csgo\hook\run_command.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="sdk\sdk.hpp" />
@@ -79,6 +81,7 @@
     <ClInclude Include="csgo\feature\esp.hpp" />
     <ClInclude Include="shared\core\data.hpp" />
     <ClInclude Include="shared\hash\xorstr.hpp" />
+    <ClInclude Include="csgo\engine\prediction.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="sdk\object\player.hpp" />

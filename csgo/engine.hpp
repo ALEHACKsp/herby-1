@@ -3,6 +3,7 @@
 #include "sdk/sdk.hpp"
 
 #include "csgo/engine/renderer.hpp"
+#include "csgo/engine/prediction.hpp"
 
 #include "csgo/feature/triggerbot.hpp"
 #include "csgo/feature/aimbot.hpp"
@@ -30,12 +31,15 @@ extern IGameMovement* m_game_movement;
 extern IInputSystem* m_input_system;
 extern ILocalize* m_localize;
 extern IPhysicsSurfaceProps* m_physics_surface_props;
+extern IPrediction* m_prediction;
 
 extern CGlobalVarsBase* m_globals;
 extern IClientMode* m_client_mode;
 extern IWeaponSystem* m_weapon_system;
 extern C_GlowObjectManager* m_glow_object;
 extern IMemAlloc* m_mem_alloc;
+extern IMoveHelper* m_move_helper;
+extern CInput* m_input;
 
 extern IDirect3DDevice9* m_direct_device;
 
@@ -45,6 +49,7 @@ extern memory::ObjectHook::Shared m_reset_hook;
 extern memory::ObjectHook::Shared m_frame_stage_notify_hook;
 extern memory::ObjectHook::Shared m_create_move_hook;
 extern memory::ObjectHook::Shared m_lock_cursor_hook;
+extern memory::ObjectHook::Shared m_run_command_hook;
 
 bool Create();
 void Destroy();

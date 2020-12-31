@@ -2,6 +2,143 @@
 
 #include "sdk/math/base.hpp"
 #include "shared/imgui/imgui.hpp"
+
+//
+// definitions
+//
+
+#define MULTIPLAYER_BACKUP 150
+
+#define TICK_INTERVAL ( csgo::m_globals->interval_per_tick )
+#define TIME_TO_TICKS( t ) ( static_cast< int >( 0.5f + static_cast< float >( t ) / TICK_INTERVAL ) )
+#define TICKS_TO_TIME( t ) ( TICK_INTERVAL * ( t ) )
+#define ROUND_TO_TICKS( t ) ( TICK_INTERVAL * TIME_TO_TICKS( t ) )
+#define TICK_NEVER_THINK ( -1 )
+
+#define FLOW_OUTGOING 0		
+#define FLOW_INCOMING 1
+#define MAX_FLOWS 2
+
+#define	HITGROUP_GENERIC	0
+#define	HITGROUP_HEAD		1
+#define	HITGROUP_CHEST		2
+#define	HITGROUP_STOMACH	3
+#define HITGROUP_LEFTARM	4	
+#define HITGROUP_RIGHTARM	5
+#define HITGROUP_LEFTLEG	6
+#define HITGROUP_RIGHTLEG	7
+
+#define	CONTENTS_EMPTY			0
+#define	CONTENTS_SOLID			0x1
+#define	CONTENTS_WINDOW			0x2
+#define	CONTENTS_AUX			0x4
+#define	CONTENTS_GRATE			0x8
+#define	CONTENTS_SLIME			0x10
+#define	CONTENTS_WATER			0x20
+#define	CONTENTS_BLOCKLOS		0x40
+#define CONTENTS_OPAQUE			0x80
+#define	LAST_VISIBLE_CONTENTS	0x80
+#define ALL_VISIBLE_CONTENTS	(LAST_VISIBLE_CONTENTS | (LAST_VISIBLE_CONTENTS-1))
+#define CONTENTS_TESTFOGVOLUME	0x100
+#define CONTENTS_UNUSED			0x200
+#define CONTENTS_UNUSED6		0x400
+#define CONTENTS_TEAM1			0x800
+#define CONTENTS_TEAM2			0x1000
+#define CONTENTS_IGNORE_NODRAW_OPAQUE	0x2000
+#define CONTENTS_MOVEABLE		0x4000
+#define	CONTENTS_AREAPORTAL		0x8000
+#define	CONTENTS_PLAYERCLIP		0x10000
+#define	CONTENTS_MONSTERCLIP	0x20000
+#define	CONTENTS_CURRENT_0		0x40000
+#define	CONTENTS_CURRENT_90		0x80000
+#define	CONTENTS_CURRENT_180	0x100000
+#define	CONTENTS_CURRENT_270	0x200000
+#define	CONTENTS_CURRENT_UP		0x400000
+#define	CONTENTS_CURRENT_DOWN	0x800000
+#define	CONTENTS_ORIGIN			0x1000000
+#define	CONTENTS_MONSTER		0x2000000
+#define	CONTENTS_DEBRIS			0x4000000
+#define	CONTENTS_DETAIL			0x8000000
+#define	CONTENTS_TRANSLUCENT	0x10000000
+#define	CONTENTS_LADDER			0x20000000
+#define CONTENTS_HITBOX			0x40000000
+
+#define	SURF_LIGHT		0x0001
+#define	SURF_SKY2D		0x0002
+#define	SURF_SKY		0x0004
+#define	SURF_WARP		0x0008
+#define	SURF_TRANS		0x0010
+#define SURF_NOPORTAL	0x0020
+#define	SURF_TRIGGER	0x0040
+#define	SURF_NODRAW		0x0080
+#define	SURF_HINT		0x0100
+#define	SURF_SKIP		0x0200
+#define SURF_NOLIGHT	0x0400
+#define SURF_BUMPLIGHT	0x0800
+#define SURF_NOSHADOWS	0x1000
+#define SURF_NODECALS	0x2000
+#define SURF_NOCHOP		0x4000
+#define SURF_HITBOX		0x8000
+
+#define	MASK_ALL					(0xFFFFFFFF)
+#define	MASK_SOLID					(CONTENTS_SOLID|CONTENTS_MOVEABLE|CONTENTS_WINDOW|CONTENTS_MONSTER|CONTENTS_GRATE)
+#define	MASK_PLAYERSOLID			(CONTENTS_SOLID|CONTENTS_MOVEABLE|CONTENTS_PLAYERCLIP|CONTENTS_WINDOW|CONTENTS_MONSTER|CONTENTS_GRATE)
+#define	MASK_NPCSOLID				(CONTENTS_SOLID|CONTENTS_MOVEABLE|CONTENTS_MONSTERCLIP|CONTENTS_WINDOW|CONTENTS_MONSTER|CONTENTS_GRATE)
+#define	MASK_WATER					(CONTENTS_WATER|CONTENTS_MOVEABLE|CONTENTS_SLIME)
+#define	MASK_OPAQUE					(CONTENTS_SOLID|CONTENTS_MOVEABLE|CONTENTS_OPAQUE)
+#define MASK_OPAQUE_AND_NPCS		(MASK_OPAQUE|CONTENTS_MONSTER)
+#define MASK_BLOCKLOS				(CONTENTS_SOLID|CONTENTS_MOVEABLE|CONTENTS_BLOCKLOS)
+#define MASK_BLOCKLOS_AND_NPCS		(MASK_BLOCKLOS|CONTENTS_MONSTER)
+#define	MASK_VISIBLE				(MASK_OPAQUE|CONTENTS_IGNORE_NODRAW_OPAQUE)
+#define MASK_VISIBLE_AND_NPCS		(MASK_OPAQUE_AND_NPCS|CONTENTS_IGNORE_NODRAW_OPAQUE)
+#define	MASK_SHOT					(CONTENTS_SOLID|CONTENTS_MOVEABLE|CONTENTS_MONSTER|CONTENTS_WINDOW|CONTENTS_DEBRIS|CONTENTS_HITBOX)
+#define MASK_SHOT_HULL				(CONTENTS_SOLID|CONTENTS_MOVEABLE|CONTENTS_MONSTER|CONTENTS_WINDOW|CONTENTS_DEBRIS|CONTENTS_GRATE)
+#define MASK_SHOT_PORTAL			(CONTENTS_SOLID|CONTENTS_MOVEABLE|CONTENTS_WINDOW|CONTENTS_MONSTER)
+#define MASK_SOLID_BRUSHONLY		(CONTENTS_SOLID|CONTENTS_MOVEABLE|CONTENTS_WINDOW|CONTENTS_GRATE)
+#define MASK_PLAYERSOLID_BRUSHONLY	(CONTENTS_SOLID|CONTENTS_MOVEABLE|CONTENTS_WINDOW|CONTENTS_PLAYERCLIP|CONTENTS_GRATE)
+#define MASK_NPCSOLID_BRUSHONLY		(CONTENTS_SOLID|CONTENTS_MOVEABLE|CONTENTS_WINDOW|CONTENTS_MONSTERCLIP|CONTENTS_GRATE)
+#define MASK_NPCWORLDSTATIC			(CONTENTS_SOLID|CONTENTS_WINDOW|CONTENTS_MONSTERCLIP|CONTENTS_GRATE)
+#define MASK_SPLITAREAPORTAL		(CONTENTS_WATER|CONTENTS_SLIME)
+#define MASK_CURRENT				(CONTENTS_CURRENT_0|CONTENTS_CURRENT_90|CONTENTS_CURRENT_180|CONTENTS_CURRENT_270|CONTENTS_CURRENT_UP|CONTENTS_CURRENT_DOWN)
+#define	MASK_DEADSOLID				(CONTENTS_SOLID|CONTENTS_PLAYERCLIP|CONTENTS_WINDOW|CONTENTS_GRATE)
+
+#define CS_MASK_SHOOT				( MASK_SOLID | CONTENTS_DEBRIS )
+
+#define TEXTURE_GROUP_LIGHTMAP						        "Lightmaps"
+#define TEXTURE_GROUP_WORLD							          "World textures"
+#define TEXTURE_GROUP_MODEL							          "Model textures"
+#define TEXTURE_GROUP_VGUI							          "VGUI textures"
+#define TEXTURE_GROUP_PARTICLE						        "Particle textures"
+#define TEXTURE_GROUP_DECAL							          "Decal textures"
+#define TEXTURE_GROUP_SKYBOX						          "SkyBox textures"
+#define TEXTURE_GROUP_CLIENT_EFFECTS				      "ClientEffect textures"
+#define TEXTURE_GROUP_OTHER							          "Other textures"
+#define TEXTURE_GROUP_PRECACHED						        "Precached"
+#define TEXTURE_GROUP_CUBE_MAP						        "CubeMap textures"
+#define TEXTURE_GROUP_RENDER_TARGET					      "RenderTargets"
+#define TEXTURE_GROUP_UNACCOUNTED					        "Unaccounted textures"
+#define TEXTURE_GROUP_STATIC_INDEX_BUFFER			    "Static Indices"
+#define TEXTURE_GROUP_STATIC_VERTEX_BUFFER_DISP		"Displacement Verts"
+#define TEXTURE_GROUP_STATIC_VERTEX_BUFFER_COLOR	"Lighting Verts"
+#define TEXTURE_GROUP_STATIC_VERTEX_BUFFER_WORLD	"World Verts"
+#define TEXTURE_GROUP_STATIC_VERTEX_BUFFER_MODELS	"Model Verts"
+#define TEXTURE_GROUP_STATIC_VERTEX_BUFFER_OTHER	"Other Verts"
+#define TEXTURE_GROUP_DYNAMIC_INDEX_BUFFER			  "Dynamic Indices"
+#define TEXTURE_GROUP_DYNAMIC_VERTEX_BUFFER			  "Dynamic Verts"
+#define TEXTURE_GROUP_DEPTH_BUFFER					      "DepthBuffer"
+#define TEXTURE_GROUP_VIEW_MODEL					        "ViewModel"
+#define TEXTURE_GROUP_PIXEL_SHADERS					      "Pixel Shaders"
+#define TEXTURE_GROUP_VERTEX_SHADERS				      "Vertex Shaders"
+#define TEXTURE_GROUP_RENDER_TARGET_SURFACE			  "RenderTarget Surfaces"
+#define TEXTURE_GROUP_MORPH_TARGETS					      "Morph Targets"
+
+#define CREATERENDERTARGETFLAGS_HDR				0x00000001
+#define CREATERENDERTARGETFLAGS_AUTOMIPMAP		0x00000002
+#define CREATERENDERTARGETFLAGS_UNFILTERABLE_OK 0x00000004
+// XBOX ONLY:
+#define CREATERENDERTARGETFLAGS_NOEDRAM			0x00000008 // inhibit allocation in 360 EDRAM
+#define CREATERENDERTARGETFLAGS_TEMP			0x00000010 // only allocates memory upon first resolve, destroyed at level end
+
 //
 // enums
 //
@@ -908,6 +1045,7 @@ class IClientNetworkable;
 class IClientRenderable;
 class IClientEntity;
 class C_BaseEntity;
+class C_BasePlayer;
 class C_BaseAnimating;
 class C_BaseCombatCharacter;
 class C_CSPlayer;
@@ -1618,6 +1756,38 @@ public:
 // interfaces
 //
 
+class IMoveHelper
+{
+public:
+	VFUNC(void, SetHost, 1, (C_CSPlayer* host), (this,host))
+};
+
+class CInput
+{
+public:
+	CUserCmd* GetUserCmd(int sequence_number)
+	{
+		return &m_pCommands[sequence_number % MULTIPLAYER_BACKUP];
+	}
+
+	CVerifiedUserCmd* GetVerifiedCmd(int sequence_number)
+	{
+		return &m_pVerifiedCommands[sequence_number % MULTIPLAYER_BACKUP];
+	}
+public:
+	PAD(0xC);
+	bool m_fTrackIRAvailable = false;
+	bool m_fMouseInitialized = false;
+	bool m_fMouseActive = false;
+	PAD(0x9E);
+	bool m_fCameraInThirdPerson = false;
+	PAD(0x2);
+	Vector m_vecCameraOffset = { };
+	PAD(0x38);
+	CUserCmd* m_pCommands = nullptr;
+	CVerifiedUserCmd* m_pVerifiedCommands = nullptr;
+};
+
 class IMaterialVar
 {
 public:
@@ -1911,6 +2081,15 @@ class IGameMovement
 {
 public:
 	VFUNC(void, ProcessMovement, 1, (C_CSPlayer* localPlayer, CMoveData* moveData), (this, localPlayer, moveData))
+	VFUNC(void, StartTrackPredictionErrors, 3, (C_CSPlayer* localPlayer), (this, localPlayer))
+	VFUNC(void, FinishTrackPredictionErrors, 4, (C_CSPlayer* localPlayer), (this, localPlayer))
+};
+
+class IPrediction
+{
+public:
+	VFUNC(void, SetupMove, 20, (C_CSPlayer* localPlayer, CUserCmd* cmd, IMoveHelper* helper, CMoveData* move_data), (this, localPlayer, cmd, helper, move_data))
+	VFUNC(void, FinishMove, 21, (C_CSPlayer* localPlayer, CUserCmd* cmd, CMoveData* move_data), (this, localPlayer, cmd, move_data));
 };
 
 class IGameUI

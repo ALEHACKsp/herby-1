@@ -9,11 +9,15 @@
 namespace csgo::hook
 {
 
-INT API_FASTCALL FrameStageNotify( void* ecx, void* edx, int stage )
+INT API_FASTCALL FrameStageNotify( ClientFrameStage_t stage )
 {
 	m_frame_stage_notify_hook->Restore();
-	const auto result = m_frame_stage_notify_hook->Call< INT >( ecx, stage );
+	const auto result = m_frame_stage_notify_hook->FastCall< INT >( stage );
 	m_frame_stage_notify_hook->Replace();
+
+	auto& prediction = engine::Prediction::Instance();
+
+	prediction.FrameStageNotify(stage);
 
 	return result;
 

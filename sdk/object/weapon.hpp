@@ -48,7 +48,10 @@ public:
 	bool IsSniper();
 
 	CCSWeaponInfo* GetCSWeaponData();
-
+public:
+	VFUNC(float, GetSpread, 452, (), (this))
+	VFUNC(float, GetInaccuracy, 482, (), (this))
+	VFUNC(void, UpdateAccuracyPenalty, 483, (), (this))
 public:
 	NET_PROP( float, m_fAccuracyPenalty, "DT_WeaponCSBase", "m_fAccuracyPenalty" );
 	NET_PROP( float, m_flRecoilIndex, "DT_WeaponCSBase", "m_flRecoilIndex" );

@@ -22,6 +22,7 @@ IGameMovement* m_game_movement = nullptr;
 IInputSystem* m_input_system = nullptr;
 ILocalize* m_localize = nullptr;
 IPhysicsSurfaceProps* m_physics_surface_props = nullptr;
+IPrediction* m_prediction = nullptr;
 
 
 CGlobalVarsBase* m_globals = nullptr;
@@ -29,6 +30,8 @@ IClientMode* m_client_mode = nullptr;
 IWeaponSystem* m_weapon_system = nullptr;
 C_GlowObjectManager* m_glow_object = nullptr;
 IMemAlloc* m_mem_alloc = nullptr;
+IMoveHelper* m_move_helper = nullptr;
+CInput* m_input = nullptr;
 
 IDirect3DDevice9* m_direct_device = nullptr;
 
@@ -38,6 +41,7 @@ memory::ObjectHook::Shared m_reset_hook = { };
 memory::ObjectHook::Shared m_frame_stage_notify_hook = { };
 memory::ObjectHook::Shared m_create_move_hook = { };
 memory::ObjectHook::Shared m_lock_cursor_hook = { };
+memory::ObjectHook::Shared m_run_command_hook = { };
 
 bool Create()
 {
@@ -156,6 +160,11 @@ bool Create()
 	if (!m_physics_surface_props)
 		return false;
 
+	m_prediction = factory_client.Get< IPrediction* >("VClientPrediction");
+
+	if (!m_prediction)
+		return false;
+
 	m_globals = **reinterpret_cast<CGlobalVarsBase***>(m_base_client->ToArray(11) + 10);
 
 	if( !m_globals )
@@ -179,6 +188,16 @@ bool Create()
 	m_mem_alloc = *reinterpret_cast<IMemAlloc**>(GetProcAddress(GetModuleHandleA("tier0.dll"), "g_pMemAlloc"));
 
 	if (!m_mem_alloc)
+		return false;
+
+	m_move_helper = memory::scan< IMoveHelper* >("client.dll", "8B 0D ? ? ? ? 8B 45 ? 51 8B D4 89 02 8B 01", 2, 2u);
+
+	if (!m_move_helper)
+		return false;
+
+	m_input = memory::scan< CInput* >("client.dll", "B9 ? ? ? ? F3 0F 11 04 24 FF 50 10", 1, 1u);
+
+	if (!m_input)
 		return false;
 
 	m_direct_device = memory::scan< IDirect3DDevice9* >("shaderapidx9.dll", "A1 ? ? ? ? 50 8B 08 FF 51 0C", 1u);
@@ -208,8 +227,9 @@ bool Create()
 	const auto reset_address = memory::vget< 16, void* >( m_direct_device );
 
 	const auto frame_stage_notify_address = memory::vget< 37, void* >( m_base_client );
-	const auto create_move_address = memory::vget< 24, void* >( m_client_mode );
+	const auto create_move_address = memory::vget< 22, void* >( m_base_client );
 	const auto lock_cursor_address = memory::vget< 67, void* >( m_surface );
+	const auto run_command_address = memory::vget< 19, void*>( m_prediction );
 
 	m_present_hook = std::make_shared< memory::ObjectHook >( present_address, &hook::Present );
 	m_reset_hook = std::make_shared< memory::ObjectHook >( reset_address, &hook::Reset );
@@ -217,6 +237,7 @@ bool Create()
 	m_frame_stage_notify_hook = std::make_shared< memory::ObjectHook >( frame_stage_notify_address, &hook::FrameStageNotify );
 	m_create_move_hook = std::make_shared< memory::ObjectHook >( create_move_address, &hook::CreateMove);
 	m_lock_cursor_hook = std::make_shared< memory::ObjectHook >( lock_cursor_address, &hook::LockCursor);
+	m_run_command_hook = std::make_shared< memory::ObjectHook >( run_command_address, &hook::RunCommand);
 
 	return true;
 }
@@ -254,6 +275,9 @@ void Destroy()
 
 	if (m_lock_cursor_hook)
 		m_lock_cursor_hook.reset();
+
+	if (m_run_command_hook)
+		m_run_command_hook.reset();
 }
 
 }
