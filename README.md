@@ -2,7 +2,7 @@
 
 [![AppVeyor](https://img.shields.io/appveyor/build/ZeroXKiritsu/herby)](https://ci.appveyor.com/project/ZeroXKiritsu/herby)
 [![GitHub issues](https://img.shields.io/github/issues/ZeroXKiritsu/herby)](https://github.com/ZeroXKiritsu/herby/issues)
-[![Github language count](https://img.shields.io/github/languages/count/ZeroXKiritsu/herby?style=social)](https://github.com/ZeroXKiritsu/herby/languages)
+[![Github language count](https://img.shields.io/github/languages/count/ZeroXKiritsu/herby?style=social)](https://github.com/languages/count/ZeroXKiritsu/herby)
 
 ## Information
 - CS:GO cheat development kit started by Me on 31.12.2020 
