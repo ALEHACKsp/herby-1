@@ -3,7 +3,9 @@
 [![AppVeyor](https://img.shields.io/appveyor/build/ZeroXKiritsu/herby)](https://ci.appveyor.com/project/ZeroXKiritsu/herby)
 [![GitHub issues](https://img.shields.io/github/issues/ZeroXKiritsu/herby)](https://github.com/ZeroXKiritsu/herby/issues)
 [![Github language count](https://img.shields.io/github/languages/count/ZeroXKiritsu/herby)]
-[![GitHub](https://img.shields.io/github/license/ZeroXKiritsu/herby)]
+[![GitHub forks](https://img.shields.io/github/forks/ZeroXKiritsu/herby)](https://github.com/ZeroXKiritsu/herby/network/members)
+
+
 
 
 ## Information
