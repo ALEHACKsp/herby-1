@@ -2,11 +2,11 @@
 
 #include "shared/include/auto.hpp"
 
-#define XorStr_(str) ::shared::jm::xor_string([]() { return str; }, std::integral_constant<std::size_t, sizeof(str) / sizeof(*str)>{}, std::make_index_sequence<::jm::detail::_buffer_size<sizeof(str)>()>{})
+#define XorStr_(str) ::shared::jm::xor_string([]() { return str; }, std::integral_constant<std::size_t, sizeof(str) / sizeof(*str)>{}, std::make_index_sequence<::shared::jm::detail::_buffer_size<sizeof(str)>()>{})
 #define XorStr(str) XorStr_(str).crypt_get()
 
 #if defined(__clang__) || defined(__GNUC__)
-#define JM_XORSTR_LOAD_FROM_REG(x) ::jm::detail::load_from_reg(x)
+#define JM_XORSTR_LOAD_FROM_REG(x) ::shared::jm::detail::load_from_reg(x)
 #else
 #define JM_XORSTR_LOAD_FROM_REG(x) (x)
 #endif

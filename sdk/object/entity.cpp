@@ -17,7 +17,7 @@ C_BaseEntity* C_BaseEntity::GetBaseEntityFromHandle( const CBaseHandle base_hand
 
 void C_BaseEntity::SetPredictionSeed(CUserCmd* cmd)
 {
-	static auto m_pPredictionRandomSeed = memory::scan< int* >("client.dll", "8B 0D ? ? ? ? BA ? ? ? ? E8 ? ? ? ? 83 C4 04", 2, 1u);
+	static auto m_pPredictionRandomSeed = memory::scan< int* >(XorStr("client.dll"), XorStr("8B 0D ? ? ? ? BA ? ? ? ? E8 ? ? ? ? 83 C4 04"), 2, 1u);
 
 	if (cmd)
 		*m_pPredictionRandomSeed = cmd->random_seed;

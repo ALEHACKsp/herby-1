@@ -13,7 +13,7 @@ Factory::Factory( const std::string& image_name ) :
 
 void Factory::CreateFactoryMap( )
 {
-	auto create_interface = reinterpret_cast<std::uintptr_t>(GetProcAddress(m_image, "CreateInterface"));
+	auto create_interface = reinterpret_cast<std::uintptr_t>(GetProcAddress(m_image, XorStr("CreateInterface")));
 
 	if (!create_interface)
 		return;

@@ -12,7 +12,7 @@
 #define d_print( data )
 #define d_print_value( data )
 #else
-#define d_print( data ) MessageBox( GetActiveWindow(), std::string( data ).c_str(), "", 0u )
-#define d_print_value( data ) MessageBox( GetActiveWindow(), std::to_string( ( unsigned long )data ).c_str(), "", 0u )
+#define d_print( data ) MessageBoxA( GetActiveWindow(), std::string( data ).c_str(), "", 0u )
+#define d_print_value( data ) MessageBoxA( GetActiveWindow(), std::to_string( ( unsigned long )data ).c_str(), "", 0u )
 #endif
 

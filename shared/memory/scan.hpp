@@ -26,7 +26,7 @@ T scan( const std::string& image_name,
 	const std::size_t read = 0 )
 {
 	const auto scan_result = ScanImage( image_name, signature, displacement, read );
-	return ( T )( scan_result );
+	return reinterpret_cast<T>( scan_result );
 }
 
 }

@@ -1,9 +1,9 @@
 #pragma once
 
 #include "shared/include/auto.hpp"
-#include "shared/include/win32.hpp"
 
 #include "shared/detail/singleton.hpp"
+#include "shared/hash/xorstr.hpp"
 
 namespace shared::win32
 {

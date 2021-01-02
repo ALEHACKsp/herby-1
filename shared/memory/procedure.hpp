@@ -8,8 +8,8 @@ namespace shared::memory
 template< std::size_t N, typename T >
 T vget( void* object )
 {
-	const auto procedure_array = *( std::uintptr_t** )( object );
-	return ( T )( procedure_array[ N ] );
+	const auto procedure_array = *reinterpret_cast<std::uintptr_t**>( object );
+	return reinterpret_cast<T>( procedure_array[ N ] );
 }
 
 template< std::size_t N, typename T, typename... ArgsT >

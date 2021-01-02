@@ -30,7 +30,7 @@ private:
 		const auto& net_prop_system = csgo::engine::NetPropSystem::Instance(); \
 		static auto displacement = 0; \
         if( !displacement ) \
-             displacement = net_prop_system.Get( recv_table_name, recv_prop_name ); \
+             displacement = net_prop_system.Get(  XorStr(recv_table_name),  XorStr(recv_prop_name) ); \
 		return *( return_type* )( this + displacement ); \
 	}
 
@@ -40,6 +40,6 @@ private:
 		const auto& net_prop_system = csgo::engine::NetPropSystem::Instance(); \
 		static auto displacement = 0; \
         if( !displacement ) \
-             displacement = ( net_prop_system.Get( recv_table_name, recv_prop_name ) + extra ); \
+             displacement = ( net_prop_system.Get(  XorStr(recv_table_name),  XorStr(recv_prop_name) ) + extra ); \
 		return *( return_type* )( this + displacement ); \
 	}

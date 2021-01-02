@@ -15,7 +15,7 @@ public:
 	inline T Get( const std::string& name )
 	{
 		auto factory = m_factory_map[name];
-		return (T)factory;
+		return reinterpret_cast<T>(factory);
 	}
 private:
 	void CreateFactoryMap();

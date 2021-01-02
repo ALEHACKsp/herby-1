@@ -17,7 +17,7 @@ bool NetPropSystem::Create()
 			m_recv_array.emplace_back(recv_entry);
 	}
 
-	return (!m_recv_array.empty());
+	return !m_recv_array.empty();
 }
 
 void NetPropSystem::Destroy()

@@ -1390,7 +1390,7 @@ public:
 	T ToArray(int index)
 	{
 		static auto procedure = *reinterpret_cast<std::uintptr_t**>(this);
-		return (T)procedure[index];
+		return static_cast<T>(procedure[index]);
 	}
 
 	std::uintptr_t ToArray(int index)
@@ -1696,13 +1696,13 @@ class ConVar : public ConCommandBase
 public:
 	float GetFloat()
 	{
-		auto xored = *(std::uint32_t*) & m_pParent->m_Value.m_fValue ^ (std::uint32_t)this;
-		return *(float*)&xored;
+		auto xored = *reinterpret_cast<std::uint32_t*>(&m_pParent->m_Value.m_fValue) ^ reinterpret_cast<std::uint32_t>(this);
+		return *reinterpret_cast<float*>(&xored);
 	}
 
 	int GetInt()
 	{
-		return (int)(m_pParent->m_Value.m_nValue ^ (int)this);
+		return static_cast<int>(m_pParent->m_Value.m_nValue ^ reinterpret_cast<int>(this));
 	}
 
 	bool GetBool()
@@ -1710,23 +1710,16 @@ public:
 		return !(!(GetInt()));
 	}
 
-	void SetValue(float value)
+	const char* GetString() const
 	{
-		auto new_value = value;
-
-		*(std::uint32_t*)& m_pParent->m_Value.m_fValue = *(std::uint32_t*) & new_value ^ (std::uint32_t) this;
-		*(std::uint32_t*)& m_pParent->m_Value.m_nValue = (std::uint32_t) new_value ^ (std::uint32_t) this;
+		char const* value = m_pParent->m_Value.m_pszString;
+		return value ? value : "";
 	}
-
-	void SetValue(int value)
-	{
-		return SetValue(static_cast<float>(value));
-	}
-
-	void SetValue(bool value)
-	{
-		return SetValue(static_cast<int>(value));
-	}
+public:
+	VFUNC(void, SetValue, 14, (const char* value), (this, value))
+	VFUNC(void, SetValue, 15, (float value), (this,value))
+	VFUNC(void, SetValue, 16, (int value), (this, value))
+	VFUNC(void, SetValue, 17, (ImColor value), (this, value))
 public:
 	struct CVValue_t
 	{
@@ -1747,14 +1740,14 @@ private:
 	CUtlVector< FnChangeCallback_t > m_fnChangeCallbacks = { };
 };
 
+//
+// interfaces
+//
+
 class IClientMode
 {
 public:
 };
-
-//
-// interfaces
-//
 
 class IMoveHelper
 {

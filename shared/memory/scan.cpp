@@ -25,7 +25,7 @@ std::uintptr_t ScanLocation( const std::uintptr_t location,
 		if( !scan_data[ 0 ] )
 			break;
 
-		if( scan_data[ 0 ] == '\?' || ( *( std::uint8_t* )( scan_current ) == GET_BYTE( scan_data ) ) )
+		if( scan_data[ 0 ] == '\?' || ( *reinterpret_cast<std::uint8_t*>( scan_current ) == GET_BYTE( scan_data ) ) )
 		{
 			if( !scan_result )
 				scan_result = scan_current;
@@ -50,7 +50,7 @@ std::uintptr_t ScanLocation( const std::uintptr_t location,
 		{
 			for( auto i = 0; i < read; i++ )
 			{
-				scan_result = *( std::uintptr_t* )( scan_result );
+				scan_result = *reinterpret_cast<std::uintptr_t*>( scan_result );
 
 				if( !scan_result )
 					break;

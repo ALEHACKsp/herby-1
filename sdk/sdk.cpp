@@ -28,7 +28,7 @@ SpoofedConVar::~SpoofedConVar()
 		SetFloat(m_restore_value);
 
 		VirtualProtect((void*)m_cvar_restore->m_pszName, 128, PAGE_READWRITE, &protect);
-		strncpy_s((char*)m_cvar_restore->m_pszName, 128, m_restore_name, 128);
+		strncpy_s(const_cast<char*>(m_cvar_restore->m_pszName), 128, m_restore_name, 128);
 		VirtualProtect((void*)m_cvar_restore->m_pszName, 128, protect, &protect);
 
 		csgo::m_cvar->UnregisterConCommand(m_cvar_replace);
@@ -51,9 +51,9 @@ void SpoofedConVar::Spoof()
 		strncpy_s(m_restore_name, 128, m_cvar_restore->m_pszName, 128);
 		m_restore_value = m_cvar_restore->GetFloat();
 
-		sprintf_s(m_replace_name, 128, "d_%s", m_restore_name);
+		sprintf_s(m_replace_name, 128, XorStr("d_%s"), m_restore_name);
 
-		m_cvar_replace = (ConVar*)std::malloc(sizeof(ConVar));
+		m_cvar_replace = static_cast<ConVar*>(std::malloc(sizeof(ConVar)));
 
 		if (!m_cvar_replace)
 			return;
@@ -66,7 +66,7 @@ void SpoofedConVar::Spoof()
 		unsigned long protect = 0u;
 
 		VirtualProtect((void*)m_cvar_restore->m_pszName, 128, PAGE_READWRITE, &protect);
-		strncpy_s((char*)m_cvar_restore->m_pszName, 128, m_replace_name, 128);
+		strncpy_s(const_cast<char*>(m_cvar_restore->m_pszName), 128, m_replace_name, 128);
 		VirtualProtect((void*)m_cvar_restore->m_pszName, 128, protect, &protect);
 
 		SetFlags(0);
@@ -105,14 +105,14 @@ void SpoofedConVar::SetFloat(float flValue)
 KeyValues::KeyValues(const char* setName)
 {
 	using Fn = void(__thiscall*)(void*, const char*);
-	static auto procedure = memory::scan<Fn>("client.dll", "8B 0E 33 4D FC 81 E1 ? ? ? ? 31 0E 88 46 03 C1 F8 08 66 89 46 12 8B C6", -0x0045);
+	static auto procedure = memory::scan<Fn>(XorStr("client.dll"), XorStr("8B 0E 33 4D FC 81 E1 ? ? ? ? 31 0E 88 46 03 C1 F8 08 66 89 46 12 8B C6"), -0x0045);
 	procedure(this, setName);
 }
 
 bool KeyValues::LoadBuffer(const char* resourceName, const char* pBuffer, void* pSomething /*= nullptr*/, void* pAnother /*= nullptr*/, void* pLast /*= nullptr*/)
 {
 	using Fn = bool(__thiscall*)(KeyValues*, const char*, const char*, void*, void*, void*);
-	static auto procedure = memory::scan<Fn>("client.dll", "55 8B EC 83 E4 F8 83 EC 34 53 8B 5D 0C 89");
+	static auto procedure = memory::scan<Fn>(XorStr("client.dll"), XorStr("55 8B EC 83 E4 F8 83 EC 34 53 8B 5D 0C 89"));
 	return procedure(this, resourceName, pBuffer, pSomething, pAnother, pLast);
 }
 
@@ -148,21 +148,21 @@ bool WorldToScreen( const Vector& world, ImVec2& screen )
 bool SmokeTraceLine(Vector start, Vector end)
 {
 	using Fn = bool(__cdecl*) (Vector, Vector);
-	static auto procedure = memory::scan<Fn>("client.dll", "55 8B EC 83 EC 08 8B 15 ? ? ? ? 0F 57 C0");
+	static auto procedure = memory::scan<Fn>(XorStr("client.dll"), XorStr("55 8B EC 83 EC 08 8B 15 ? ? ? ? 0F 57 C0"));
 	return procedure(start, end);
 }
 
 void RandomSeed(unsigned int seed)
 {
 	using Fn = void(*)(unsigned int);
-	static auto original = (Fn)GetProcAddress(GetModuleHandleA("vstdlib.dll"), "RandomSeed");
+	static auto original = reinterpret_cast<Fn>(GetProcAddress(GetModuleHandleA(XorStr("vstdlib.dll")), XorStr("RandomSeed")));
 	return original(seed);
 }
 
 float RandomFloat(float min, float max)
 {
 	using Fn = float(*)(float, float);
-	static auto original = (Fn)GetProcAddress(GetModuleHandleA("vstdlib.dll"), "RandomFloat");
+	static auto original = reinterpret_cast<Fn>(GetProcAddress(GetModuleHandleA(XorStr("vstdlib.dll")), XorStr("RandomFloat")));
 	return original(min, max);
 }
 

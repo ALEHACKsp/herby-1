@@ -43,7 +43,7 @@ void Vector::Invalidate()
 
 bool Vector::IsValid() const
 {
-	return ( !IsZero() );
+	return !IsZero();
 }
 
 bool Vector::IsZero() const

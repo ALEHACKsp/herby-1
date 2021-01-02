@@ -47,9 +47,9 @@ void ObjectHook::Replace()
 	if( !m_procedure )
 		return;
 
-	*( std::uint16_t* )( m_procedure ) = 0x50B8;
-	*( void** )( m_procedure + 1 ) = m_replace;
-	*( std::uint16_t* )( m_procedure + 5 ) = 0xE0FF;
+	*reinterpret_cast<std::uint16_t*>( m_procedure ) = 0x50B8;
+	*reinterpret_cast<void**>( m_procedure + 1 ) = m_replace;
+	*reinterpret_cast<std::uint16_t*>( m_procedure + 5 ) = 0xE0FF;
 }
 
 void ObjectHook::Restore()

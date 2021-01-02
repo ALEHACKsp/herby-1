@@ -39,7 +39,7 @@ void QAngle::Invalidate()
 
 bool QAngle::IsValid() const
 {
-	return ( !IsZero() );
+	return !IsZero();
 }
 
 bool QAngle::IsZero() const

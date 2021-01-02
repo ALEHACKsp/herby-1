@@ -29,7 +29,7 @@ bool Renderer::Create( IDirect3DDevice9* device )
 	font_config.PixelSnapH = true;
 
 	auto& io = ImGui::GetIO();
-	io.Fonts->AddFontFromFileTTF( "C:\\Windows\\Fonts\\Arial.ttf", 16.f, &font_config, io.Fonts->GetGlyphRangesCyrillic() );
+	io.Fonts->AddFontFromFileTTF(XorStr("C:\\Windows\\Fonts\\Arial.ttf"), 16.f, &font_config, io.Fonts->GetGlyphRangesCyrillic() );
 
 	return true;
 }
@@ -79,7 +79,7 @@ bool Renderer::Begin()
 	ImGui::NewFrame();
 
 	ImGui::PushStyleColor(ImGuiCol_WindowBg, { 0, 0, 0, 0 });
-	auto result = ImGui::Begin("overlay", reinterpret_cast<bool*>(true), ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoInputs);
+	auto result = ImGui::Begin(XorStr("overlay"), reinterpret_cast<bool*>(true), ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoInputs);
 
 	auto& io = ImGui::GetIO();
 	ImGui::SetWindowPos({ 0.f, 0.f }, ImGuiCond_Always);

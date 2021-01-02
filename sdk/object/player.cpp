@@ -6,14 +6,14 @@
 void C_BasePlayer::SetAbsOrigin(const Vector& origin)
 {
 	using Fn = void(__thiscall*)(void*, const Vector&);
-	static auto procedure = memory::scan<Fn>("client.dll", "55 8B EC 83 E4 F8 51 53 56 57 8B F1 E8");
+	static auto procedure = memory::scan<Fn>(XorStr("client.dll"), XorStr("55 8B EC 83 E4 F8 51 53 56 57 8B F1 E8"));
 	return procedure(this, origin);
 }
 
 void C_BasePlayer::SetAbsAngles(const QAngle& angles)
 {
 	using Fn = void(__thiscall*)(void*, const QAngle&);
-	static auto procedure = memory::scan<Fn>("client.dll", "55 8B EC 83 E4 F8 83 EC 64 53 56 57 8B F1 E8");
+	static auto procedure = memory::scan<Fn>(XorStr("client.dll"), XorStr("55 8B EC 83 E4 F8 83 EC 64 53 56 57 8B F1 E8"));
 	return procedure(this, angles);
 }
 
@@ -25,7 +25,7 @@ C_BasePlayer* C_BasePlayer::GetBasePlayer(int index)
 
 const Vector& C_BasePlayer::EyePosition() const
 {
-	return ( m_vecOrigin() + m_vecViewOffset() );
+	return m_vecOrigin() + m_vecViewOffset();
 }
 
 C_CSPlayer* C_CSPlayer::GetLocalCSPlayer()

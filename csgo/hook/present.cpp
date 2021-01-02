@@ -15,7 +15,7 @@ HRESULT API_D3D Present( IDirect3DDevice9* device, const RECT* source_rect, cons
 	{
 		if (renderer.Begin())
 		{
-			renderer.DrawText({ 20.f, 10.f }, engine::TextLeft, { 1.f, 1.f, 1.f }, "herby");
+			renderer.DrawText({ 20.f, 10.f }, engine::TextLeft, { 1.f, 1.f, 1.f }, XorStr("herby"));
 
 			esp.Present();
 
